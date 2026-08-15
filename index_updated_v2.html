@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>សៀគ្វីអគ្គិសនី & សំណួរវាយតម្លៃ</title>
+    <style>
+        body { font-family: 'Khmer OS Battambang', Arial, sans-serif; text-align: center; background-color: #2c3e50; color: white; padding: 20px; margin: 0; }
+        h2 { color: #ecf0f1; margin-bottom: 5px; }
+        p.subtitle { color: #bdc3c7; margin-top: 0; margin-bottom: 25px; }
+        
+        /* ផ្នែកសៀគ្វី (Circuit Styles) */
+        .circuit-board { border: 4px solid #34495e; width: 480px; height: 320px; margin: 0 auto 30px auto; position: relative; border-radius: 15px; background: #1a252f; box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.3); }
+        .wire { background-color: #7f8c8d; position: absolute; box-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .wire-top { top: 50px; left: 60px; right: 60px; height: 6px; }
+        .wire-bottom { bottom: 50px; left: 60px; right: 60px; height: 6px; }
+        .wire-left { top: 50px; bottom: 50px; left: 60px; width: 6px; }
+        .wire-right { top: 50px; bottom: 50px; right: 60px; width: 6px; }
+        .battery { position: absolute; left: 30px; top: 120px; width: 66px; height: 86px; background: linear-gradient(#34495e, #2c3e50); border: 2px solid #bdc3c7; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; z-index: 10; box-shadow: 2px 2px 5px rgba(0,0,0,0.5); }
+        .battery::before { content: "+"; color: #e74c3c; font-size: 24px; position: absolute; top: 2px; }
+        .resistor { position: absolute; top: 35px; left: 200px; width: 80px; height: 30px; background: #d35400; border: 2px solid #e67e22; color: white; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; z-index: 10; box-shadow: 2px 2px 5px rgba(0,0,0,0.5); }
+        .led-container { position: absolute; right: 37px; top: 135px; width: 52px; height: 52px; background: rgba(255, 0, 0, 0.1); border-radius: 50%; border: 2px solid #c0392b; display: flex; align-items: center; justify-content: center; z-index: 10; transition: all 0.15s ease; }
+        .led-symbol { width: 28px; height: 28px; stroke: #fff; stroke-width: 8; fill: none; opacity: 0.7; }
+        .pot-wrapper { position: absolute; bottom: 23px; left: 190px; width: 100px; height: 110px; z-index: 10; }
+        .pot-pins { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; }
+        .pin { width: 8px; height: 30px; background: linear-gradient(to right, #d7d7d7, #ffffff, #a3a3a3); border-radius: 0 0 2px 2px; box-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .pot-base { position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); width: 80px; height: 25px; background: #9f4f2a; border-radius: 4px; display: flex; justify-content: space-evenly; align-items: center; padding-top: 3px; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.5), 0 3px 5px rgba(0,0,0,0.5); }
+        .rivet { width: 8px; height: 8px; background: radial-gradient(circle, #ddd, #777); border-radius: 50%; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.6); }
+        .pot-housing { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 75px; height: 75px; background: radial-gradient(circle at 30% 30%, #ffffff, #b3b3b3 60%, #666666); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 10px rgba(0,0,0,0.6), inset 0 -3px 6px rgba(0,0,0,0.3); }
+        .pot-shaft { width: 38px; height: 38px; background: radial-gradient(circle, #e0e0e0, #999999); border-radius: 50%; position: relative; transition: transform 0.1s linear; transform: rotate(-135deg); box-shadow: 0 4px 6px rgba(0,0,0,0.6), inset 0 2px 3px rgba(255,255,255,0.8); }
+        .pot-slot { position: absolute; top: 10%; left: 50%; transform: translateX(-50%); width: 6px; height: 80%; background: #222; border-radius: 2px; box-shadow: inset 1px 1px 2px black, 1px 1px 1px rgba(255,255,255,0.4); }
+        .controls { background: #ecf0f1; color: #2c3e50; max-width: 480px; margin: 0 auto 40px auto; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); text-align: left; }
+        input[type="range"] { width: 100%; margin: 15px 0; cursor: pointer; height: 8px; border-radius: 5px; background: #bdc3c7; outline: none; -webkit-appearance: none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #e74c3c; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .data-box { background: #fff; padding: 12px; border-radius: 8px; border-left: 5px solid #2980b9; margin-bottom: 12px; font-family: monospace; font-size: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .highlight { color: #c0392b; font-weight: bold; font-size: 20px;}
+
+        /* ផ្នែកកម្រងសំណួរ និងប្រអប់ចុះឈ្មោះ */
+        .form-container { background: #ffffff; color: #333; max-width: 700px; margin: 0 auto 50px auto; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); text-align: left; }
+        .header-title { text-align: center; border-bottom: 2px solid #ecf0f1; padding-bottom: 15px; margin-bottom: 25px; color: #2980b9; }
+        
+        /* Registration Form */
+        #registration-section { text-align: center; padding: 20px 0; }
+        .name-input { width: 80%; padding: 12px; font-size: 16px; border: 2px solid #bdc3c7; border-radius: 8px; font-family: inherit; margin-bottom: 20px; outline: none; transition: border 0.3s; }
+        .name-input:focus { border-color: #3498db; }
+        
+        /* Quiz Section (លាក់សិន) */
+        #quiz-section { display: none; }
+        .question-block { margin-bottom: 25px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #34495e; }
+        .question-text { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #2c3e50; }
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .option-label { display: flex; align-items: center; padding: 10px 15px; background: #fff; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; transition: all 0.2s ease; font-size: 15px; }
+        .option-label:hover { background: #eef2f5; border-color: #bdc3c7; }
+        .option-label input[type="radio"] { margin-right: 15px; transform: scale(1.2); cursor: pointer; }
+        
+        /* លុបចោល style ពណ៌បៃតង/ក្រហម សម្រាប់ចម្លើយត្រូវខុស */
+        
+        .action-btn { display: block; width: 100%; padding: 15px; background: #2980b9; color: white; font-family: inherit; font-size: 18px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: background 0.3s; margin-top: 20px; }
+        .action-btn:hover { background: #1a5276; }
+        .submit-btn { background: #27ae60; }
+        .submit-btn:hover { background: #219150; }
+        
+        .result-box { display: none; text-align: center; margin-top: 20px; padding: 15px; border-radius: 8px; font-size: 18px; font-weight: bold; }
+        .loading { display: none; text-align: center; margin-top: 15px; color: #f39c12; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <!-- ផ្នែកទី១៖ កម្មវិធីពិសោធន៍ (Simulation) -->
+    <h2>ម៉ូដែលសៀគ្វីអគ្គិសនីពេញលេញ</h2>
+    <p class="subtitle">រួមបញ្ចូលប៉ូតង់ស្យូម៉ែត (Potentiometer) រេស៊ីស្តរថេរ និងអំពូល LED</p>
+
+    <div class="circuit-board">
+        <div class="wire wire-top"></div><div class="wire wire-bottom"></div>
+        <div class="wire wire-left"></div><div class="wire wire-right"></div>
+        <div class="battery"><span>9V</span></div>
+        <div class="resistor">220 Ω</div>
+        <div class="led-container" id="led-bulb">
+            <svg class="led-symbol" viewBox="0 0 100 100">
+                <polygon points="20,25 80,25 50,75" fill="#fff" stroke="none" />
+                <line x1="20" y1="75" x2="80" y2="75" />
+            </svg>
+        </div>
+        <div class="pot-wrapper">
+            <div class="pot-pins"><div class="pin"></div><div class="pin"></div><div class="pin"></div></div>
+            <div class="pot-base"><div class="rivet"></div><div class="rivet"></div><div class="rivet"></div></div>
+            <div class="pot-housing"><div class="pot-shaft" id="pot-shaft"><div class="pot-slot"></div></div></div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <label><b>មួលប៉ូតង់ស្យូម៉ែត (កែតម្រូវរេស៊ីស្តង់):</b> <span class="highlight" id="pot-display">1000</span> Ω</label>
+        <input type="range" id="pot-slider" min="0" max="2000" value="1000" step="10" oninput="calculateCircuit()">
+        <div class="data-box">រេស៊ីស្តង់សរុប (R<sub>សរុប</sub>): <span id="r-total">1220</span> Ω <br><small style="color:#7f8c8d;">(រេស៊ីស្តរការពារ 220Ω + ប៉ូតង់ស្យូម៉ែត)</small></div>
+        <div class="data-box" style="border-left-color: #c0392b;">ចរន្តអគ្គិសនីរត់កាត់ (I): <span class="highlight" id="current-display">0.00</span> mA</div>
+    </div>
+
+    <!-- ផ្នែកទី២៖ ទម្រង់ទូទៅ (Form Container) -->
+    <div class="form-container">
+        
+        <!-- ប្រអប់ចុះឈ្មោះ (បង្ហាញមុន) -->
+        <div id="registration-section">
+            <h2 class="header-title">វាយតម្លៃចំណេះដឹង</h2>
+            <p>សូមបញ្ចូលឈ្មោះរបស់អ្នក មុនពេលចូលទៅកាន់ការឆ្លើយសំណួរ។</p>
+            <input type="text" id="studentName" class="name-input" placeholder="ឧទាហរណ៍៖ សុខ សាន្ត..." required>
+            <button class="action-btn" onclick="startQuiz()">ចាប់ផ្ដើមឆ្លើយសំណួរ</button>
+        </div>
+
+        <!-- កម្រងសំណួរ (លាក់សិន) -->
+        <div id="quiz-section">
+            <div class="header-title">
+                <h2>សំណួរវាយតម្លៃចំណេះដឹង</h2>
+                <p>សិស្ស៖ <b id="display-name" style="color:#e74c3c;"></b></p>
+            </div>
+
+            <form id="quizForm">
+                <div class="question-block">
+                    <div class="question-text">១. តើមុខងារសំខាន់របស់រេស៊ីស្តរ ២២០អូម ក្នុងសៀគ្វីនេះ គឺដើម្បីអ្វី?</div>
+                    <div class="options">
+                        <label class="option-label"><input type="radio" name="q1" value="A"> ក. បង្កើនកម្លាំងអគ្គិសនីរបស់ជនិតា</label>
+                        <label class="option-label"><input type="radio" name="q1" value="B"> ខ. ការពារកុំឱ្យអំពូល LED ឆេះពេលចរន្តហូរខ្លាំងពេក</label>
+                        <label class="option-label"><input type="radio" name="q1" value="C"> គ. បញ្ឈប់ដំណើរការរបស់ប៉ូតង់ស្យូម៉ែតទាំងស្រុង</label>
+                        <label class="option-label"><input type="radio" name="q1" value="D"> ឃ. បង្កើតពន្លឺពណ៌ខៀវនៅលើអំពូល LED</label>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <div class="question-text">២. យោងតាមច្បាប់អូម ពេលមួលបង្កើនរេស៊ីស្តង់សរុប តើចរន្តអគ្គិសនី (I) នឹងទៅជាយ៉ាងណា?</div>
+                    <div class="options">
+                        <label class="option-label"><input type="radio" name="q2" value="A"> ក. កើនឡើងខ្ពស់</label>
+                        <label class="option-label"><input type="radio" name="q2" value="B"> ខ. នៅដដែលឥតប្រែប្រួល</label>
+                        <label class="option-label"><input type="radio" name="q2" value="C"> គ. ថយចុះ</label>
+                        <label class="option-label"><input type="radio" name="q2" value="D"> ឃ. ធ្លាក់ចុះដល់សូន្យភ្លាមៗ</label>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <div class="question-text">៣. តើត្រីកោណនិងបន្ទាត់បញ្ឈប់នៅលើអំពូល LED តំណាងឱ្យអ្វី?</div>
+                    <div class="options">
+                        <label class="option-label"><input type="radio" name="q3" value="A"> ក. កុងតាក់អគ្គិសនី</label>
+                        <label class="option-label"><input type="radio" name="q3" value="B"> ខ. ជនិតាថាមពល</label>
+                        <label class="option-label"><input type="radio" name="q3" value="C"> គ. ឌីយ៉ូត (Diode) បង្ហាញទិសដៅចរន្តហូរ</label>
+                        <label class="option-label"><input type="radio" name="q3" value="D"> ឃ. រេស៊ីស្តរថេរ</label>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <div class="question-text">៤. ពេលមួលបន្ថយតម្លៃរេស៊ីស្តង់របស់ប៉ូតង់ស្យូម៉ែត តើមានអ្វីប្រែប្រួលចំពោះអំពូល LED?</div>
+                    <div class="options">
+                        <label class="option-label"><input type="radio" name="q4" value="A"> ក. កាន់តែភ្លឺខ្លាំងឡើងៗ</label>
+                        <label class="option-label"><input type="radio" name="q4" value="B"> ខ. ប្តូរពណ៌ទៅជាពណ៌បៃតង</label>
+                        <label class="option-label"><input type="radio" name="q4" value="C"> គ. រលត់ទាំងស្រុង</label>
+                        <label class="option-label"><input type="radio" name="q4" value="D"> ឃ. គ្មានការប្រែប្រួលទេ</label>
+                    </div>
+                </div>
+
+                <button type="button" class="action-btn submit-btn" id="btn-submit" onclick="checkAnswers()">បញ្ជូនចម្លើយ (Submit)</button>
+            </form>
+            
+            <div id="loadingStatus" class="loading">កំពុងបញ្ជូនទិន្នន័យទៅកាន់ Google Sheet... ⏳</div>
+            <div id="resultDisplay" class="result-box"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- ផ្នែកសៀគ្វី (Circuit Simulation) ---
+        const VOLTAGE = 9; 
+        const LED_VOLTAGE_DROP = 2.0; 
+        const R_FIXED = 220; 
+
+        function calculateCircuit() {
+            let rPot = parseInt(document.getElementById("pot-slider").value);
+            document.getElementById("pot-display").innerText = rPot;
+            let rotationAngle = (rPot / 2000) * 270 - 135; 
+            document.getElementById("pot-shaft").style.transform = `rotate(${rotationAngle}deg)`;
+            let rTotal = R_FIXED + rPot;
+            document.getElementById("r-total").innerText = rTotal;
+            let current_mA = ((VOLTAGE - LED_VOLTAGE_DROP) / rTotal) * 1000; 
+            document.getElementById("current-display").innerText = current_mA.toFixed(2);
+            let led = document.getElementById("led-bulb");
+            let intensity = current_mA / 32; if(intensity > 1) intensity = 1; 
+            if (current_mA > 0.1) {
+                let opacity = 0.2 + (intensity * 0.8); let blur = intensity * 45; let spread = intensity * 15;
+                led.style.background = `rgba(255, 0, 0, ${opacity})`;
+                led.style.boxShadow = `0 0 ${blur}px ${spread}px rgba(255, 0, 0, ${intensity})`;
+                led.style.borderColor = "#ff3333";
+            } else {
+                led.style.background = "rgba(255, 0, 0, 0.1)"; led.style.boxShadow = "none"; led.style.borderColor = "#c0392b";
+            }
+        }
+        window.onload = calculateCircuit;
+
+
+        // --- ផ្នែកគ្រប់គ្រងឈ្មោះ និង កម្រងសំណួរ ---
+        let currentStudentName = "";
+        
+        // 🚨 សូមដាក់ URL របស់អ្នកនៅចន្លោះសញ្ញាធ្មេញកណ្តុរខាងក្រោម 🚨
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwmNb-TWGimP2g6lUJg2K1q3bCwt7ySdofVSt-yq_voizfLtPdA_xd6Gfzjkprd9enw/exec"; 
+
+        function startQuiz() {
+            let inputElement = document.getElementById("studentName");
+            if(inputElement.value.trim() === "") {
+                alert("សូមបញ្ចូលឈ្មោះរបស់អ្នកជាមុនសិន!");
+                inputElement.focus();
+                return;
+            }
+            currentStudentName = inputElement.value.trim();
+            document.getElementById("display-name").innerText = currentStudentName;
+            
+            // លាក់ប្រអប់ឈ្មោះ បង្ហាញសំណួរ
+            document.getElementById("registration-section").style.display = "none";
+            document.getElementById("quiz-section").style.display = "block";
+        }
+
+        const correctAnswers = { q1: "B", q2: "C", q3: "C", q4: "A" };
+
+        function checkAnswers() {
+            // បិទប៊ូតុងកុំឱ្យចុចផ្ទួន
+            document.getElementById("btn-submit").disabled = true;
+            
+            let correctCount = 0; 
+            let totalQuestions = 4;
+            let pointPerQuestion = 12.5; // កំណត់ពិន្ទុ ១សំណួរ = ១២.៥
+            let maxScore = 50; // ពិន្ទុសរុប ៥០
+            
+            let form = document.getElementById("quizForm");
+
+            for(let i = 1; i <= totalQuestions; i++) {
+                let qName = "q" + i;
+                let selectedOption = form.querySelector(`input[name="${qName}"]:checked`);
+
+                // បើមានជ្រើសរើសចម្លើយ ហើយត្រូវ គឺបូកចំនួនដែលត្រូវ
+                if (selectedOption && selectedOption.value === correctAnswers[qName]) {
+                    correctCount++;
+                }
+            }
+
+            // គណនាពិន្ទុសរុបដែលសិស្សទទួលបាន
+            let totalScore = correctCount * pointPerQuestion;
+
+            // បង្ហាញលទ្ធផលក្នុង HTML តែមិនបង្ហាញថាត្រូវខុសត្រង់ណាទេ
+            let resultBox = document.getElementById("resultDisplay");
+            resultBox.style.display = "block";
+            let resultText = (totalScore >= 25) ? `អបអរសាទរ! ពិន្ទុរបស់អ្នកគឺ ${totalScore}/${maxScore}` : `អ្នកទទួលបានពិន្ទុ ${totalScore}/${maxScore} ។ សូមព្យាយាមម្ដងទៀត!`;
+            resultBox.style.backgroundColor = (totalScore >= 25) ? "#d4edda" : "#f8d7da";
+            resultBox.style.color = (totalScore >= 25) ? "#155724" : "#721c24";
+            resultBox.innerHTML = resultText + `<br><small style="color:#666;">(ឈ្មោះ៖ ${currentStudentName})</small>`;
+            
+            // ហៅអនុគមន៍បញ្ជូនទៅ Google Sheet ដោយបញ្ជូនពិន្ទុសរុបធៀបនឹង ៥០
+            sendDataToGoogleSheet(currentStudentName, totalScore, maxScore);
+        }
+
+        // --- ផ្នែកផ្ញើទិន្នន័យទៅ GOOGLE SHEET ដែលបានកែសម្រួលរួច ---
+        function sendDataToGoogleSheet(name, score, total) {
+            // បង្ហាញស្ថានភាពកំពុងដំណើរការ
+            document.getElementById("loadingStatus").style.display = "block";
+            document.getElementById("loadingStatus").innerText = "កំពុងបញ្ជូនទិន្នន័យទៅកាន់ Google Sheet... ⏳";
+            document.getElementById("loadingStatus").style.color = "#f39c12";
+
+            // រៀបចំទិន្នន័យជា JSON Object
+            let quizData = {
+                "Name": name,
+                "Score": score + "/" + total
+            };
+
+            // ប្រើ Fetch API ដើម្បីផ្ញើតាម POST Method ជាមួយ mode: 'no-cors'
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', 
+                cache: 'no-cache',
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+                body: JSON.stringify(quizData)
+            })
+            .then(response => {
+                document.getElementById("loadingStatus").innerText = "បញ្ជូនទិន្នន័យរួចរាល់! ✅ (សូមពិនិត្យមើល Sheet)";
+                document.getElementById("loadingStatus").style.color = "#27ae60";
+            })
+            .catch(error => {
+                document.getElementById("loadingStatus").innerText = "មានបញ្ហាក្នុងការបញ្ជូនទិន្នន័យ ❌";
+                document.getElementById("loadingStatus").style.color = "#c0392b";
+                console.error('Error:', error);
+                // បើផ្ញើអត់ចេញ ឱ្យគេចុច Submit ម្តងទៀតបាន
+                document.getElementById("btn-submit").disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>
